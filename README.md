@@ -4,9 +4,10 @@ Browse through subdirectories to chain move/rename/delete photos
 The goal of this tool is to solve the following problem:  
 How do I do to give a meaning full name to thousands of picture without opening the next directory, open the photo, select "rename", enter the new name, save, ...  Also, when I work on bunch of photos organizing, I don't do anything else, so, full screen it is
 
-State of the project:  
 **!!!!! Verify the content of the Trash before emptying it, who knows... there could be bugs causing wrong files to be sent to trash !!!!!**  
-Discovering photos in subdirectories, renaming and deleting photos works.
+
+Changelog:
+2019-05-26, Version 0.0.0 : initial commit Discovering photos in subdirectories, renaming and deleting photos works.
 
 TODO:  
 * Option to move photos to new directory / create new sub directory
