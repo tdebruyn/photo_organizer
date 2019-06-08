@@ -36,6 +36,11 @@ class CacheMgr(QObject):
                 pm = QPixmap.fromImageReader(reader)
                 QPixmapCache.insert(cur_img_name, pm)
 
+class CommitMgr(QObject):
+    def __init__(self, image_names):
+        super().__init__()
+        self.image_names = image_names
+
     @Slot(list)
     def update_images_names(self, image_names):
         self.image_names = image_names
@@ -87,7 +92,7 @@ class AppWindow(QWidget):
         title = QLabel(self)
         title.setStyleSheet("color: rgb(170, 200, 255);"
                             "font: 40px;")
-        title.setText("Quick pictures renamer")
+        title.setText("Photos Organizer")
         title.openExternalLinks()
 
         # current file name
@@ -256,7 +261,7 @@ class AppWindow(QWidget):
 
     @Slot()
     def commit_changes(self):
-        for i, image in reversed(list(enumerate(self.images))):
+        for i, image in enumerate(self.images):
             if self.images[i].new_path:
                 os.rename(image.path, image.new_path)
                 self.images[i].path = self.images[i].new_path
@@ -273,10 +278,17 @@ class AppWindow(QWidget):
         s_cur_img_name = str(cur_img_name)
         self.fnlbl.setText(
             f"<font color=\"#aac8ff\">{cur_img_name.parent}<font>/<font color=\"#fc5a5a\">{cur_img_name.stem}<font><font color=\"#aac8ff\">{cur_img_name.suffix}<font>")
-        self.pic_id.setText(f"Picture {position + 1}/{len(self.images)}")
+        self.pic_id.setText(f"Photo {position + 1}/{len(self.images)}")
 
         if self.images[position].deleted == True:
-            self.pic_action.setText("This picture is deleted")
+            self.pic_action.setText("This photo is deleted")
+            pm = QPixmap()
+            if not QPixmapCache.find("deleted_ycfvfsAwXLMw6wB", pm):
+                reader = QImageReader("bitmaps/deleted-picture.png")
+                pm = QPixmap.fromImageReader(reader)
+                QPixmapCache.insert("deleted_ycfvfsAwXLMw6wB", pm)
+            self.picture.setPixmap(pm)
+            self.picture_slider.setValue(self.current_image)
         else:
             pm = QPixmap()
             if not QPixmapCache.find(s_cur_img_name, pm):
@@ -310,10 +322,10 @@ class AppWindow(QWidget):
         self.images.append(image)
         if len(self.images) == 1:
             self.to_image(0)
-        self.pic_id.setText(f"Picture {self.current_image + 1}/{len(self.images)} (loading)")
+        self.pic_id.setText(f"Photo {self.current_image + 1}/{len(self.images)} (loading)")
 
     def dir_crawler_finished(self):
-        self.pic_id.setText(f"Picture {self.current_image + 1}/{len(self.images)}")
+        self.pic_id.setText(f"Photo {self.current_image + 1}/{len(self.images)}")
         self.picture_slider.setMaximum(len(self.images)-1)
 
 

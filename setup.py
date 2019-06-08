@@ -31,6 +31,7 @@ setup(
     packages=find_packages(exclude=('tests')),
     install_requires=['PySide2',
                       'Send2Trash'],
+    data_files=[('photo_organizer', ['bitmaps/deleted-picture.png'])],
     entry_points = {
         'gui_scripts': [
             'photo_organizer = photo_organizer.main:main',
