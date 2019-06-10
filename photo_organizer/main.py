@@ -8,6 +8,8 @@ from PySide2.QtGui import QCursor, QPixmap, QPixmapCache, QImageReader
 import sys, os
 from pathlib import Path
 from dataclasses import dataclass
+from pkg_resources import resource_filename
+deleted_picture = resource_filename(__name__, 'bitmaps/deleted-picture.png')
 
 @dataclass
 class image(object):
@@ -284,7 +286,7 @@ class AppWindow(QWidget):
             self.pic_action.setText("This photo is deleted")
             pm = QPixmap()
             if not QPixmapCache.find("deleted_ycfvfsAwXLMw6wB", pm):
-                reader = QImageReader("bitmaps/deleted-picture.png")
+                reader = QImageReader(deleted_picture)
                 pm = QPixmap.fromImageReader(reader)
                 QPixmapCache.insert("deleted_ycfvfsAwXLMw6wB", pm)
             self.picture.setPixmap(pm)

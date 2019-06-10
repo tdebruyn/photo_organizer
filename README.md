@@ -8,10 +8,11 @@ How do I do to give a meaning full name to thousands of picture without opening 
 
 Changelog:
 2019-05-26, Version 0.0.0 : initial commit Discovering photos in subdirectories, renaming and deleting photos works.
+2019-06-10: replace deleted file with deleted icon
 
 TODO:  
 * Option to move photos to new directory / create new sub directory
-* Replace photo with "deleted" icon after a photo is deleted
+* ~~Replace photo with "deleted" icon after a photo is deleted~~
 * Option to open photos with 3rd party app
 * Filter photos (size, date, ...)
 * Sort photos (date, name, ...)
@@ -21,7 +22,7 @@ TODO:
 * Improve look and ergonomy
 * Error handling
 * Tests
-* Clean code (I'm not a developer, just writing this tool because I couldn't find existing one on the market)
+* Clean code (I'm not a developer, just writing this tool because I couldn't find existing one)
 
 Usage:  
 At the current stage, if you don't know how to install a python package, the tool is not ready for you to use yet.
