@@ -9,11 +9,14 @@ How do I do to give a meaning full name to thousands of picture without opening 
 Changelog:
 2019-05-26, Version 0.0.0 : initial commit Discovering photos in subdirectories, renaming and deleting photos works.
 2019-06-10: replace deleted file with deleted icon
+2019-06-15: add "open" button to open picture in default desktop app
 
 TODO:  
 * Option to move photos to new directory / create new sub directory
 * ~~Replace photo with "deleted" icon after a photo is deleted~~
-* Option to open photos with 3rd party app
+* ~~Option to open photos with 3rd party app~~
+* Allow switching between full screen and non full screen (useful for when opening picture in 3rd party app)
+* Replace default Python icon with custom icon
 * Filter photos (size, date, ...)
 * Sort photos (date, name, ...)
 * Send "commit" to a thread and provide visual feedback that commit was called

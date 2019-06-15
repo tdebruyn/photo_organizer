@@ -1,10 +1,10 @@
-from PySide2.QtCore import QThread, QObject, Signal, Slot, Qt, QSize
+from PySide2.QtCore import QThread, QObject, Signal, Slot, Qt, QSize, QUrl
 from PySide2.QtWidgets import (QApplication, QWidget, QPushButton,
                              QDesktopWidget, QVBoxLayout, QLineEdit, QSlider,
                              QLabel, QHBoxLayout, QFileDialog, QGroupBox)
 from PySide2 import QtCore
 from send2trash import send2trash
-from PySide2.QtGui import QCursor, QPixmap, QPixmapCache, QImageReader
+from PySide2.QtGui import QDesktopServices, QPixmap, QPixmapCache, QImageReader
 import sys, os
 from pathlib import Path
 from dataclasses import dataclass
@@ -132,6 +132,14 @@ class AppWindow(QWidget):
                               "color: rgb(150,150,150)")
         prev_btn.clicked.connect(self.prev_image)
 
+        # Open External
+        open_btn = QPushButton("Open", self)
+        open_btn.setFlat(True)
+        open_btn.setStyleSheet("border-style: outset;"
+                              "background-color: rgb(60,60,60);"
+                              "color: rgb(150,150,150)")
+        open_btn.clicked.connect(self.open_external)
+
         # prev button
         del_btn = QPushButton("(Un-)delete", self)
         del_btn.setFlat(True)
@@ -140,7 +148,7 @@ class AppWindow(QWidget):
                               "color: rgb(150,150,150)")
         del_btn.clicked.connect(self.del_image)
 
-        dir_btn = QPushButton("Discard changes and select directory", self)
+        dir_btn = QPushButton("Discard and select directory", self)
         dir_btn.setFlat(True)
         dir_btn.setStyleSheet("border-style: outset;"
                               "background-color: rgb(60,60,60);"
@@ -191,6 +199,7 @@ class AppWindow(QWidget):
         hbox.addWidget(del_btn)
         hbox.addWidget(commit_btn)
         hbox.addWidget(dir_btn)
+        hbox.addWidget(open_btn)
         hbox.addWidget(stopbtn)
 
 
@@ -260,6 +269,9 @@ class AppWindow(QWidget):
             self.current_image = len(self.images) - 1
             self.to_image(self.current_image)
 
+    @Slot()
+    def open_external(self):
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.images[self.current_image].path)))
 
     @Slot()
     def commit_changes(self):
