@@ -6,17 +6,19 @@ How do I do to give a meaning full name to thousands of picture without opening 
 
 **!!!!! Verify the content of the Trash before emptying it, who knows... there could be bugs causing wrong files to be sent to trash !!!!!**  
 
-Changelog:
-2019-05-26, Version 0.0.0 : initial commit Discovering photos in subdirectories, renaming and deleting photos works.
-2019-06-10: replace deleted file with deleted icon
-2019-06-15: add "open" button to open picture in default desktop app
+Changelog:  
+2019-05-26, Version 0.0.0 : initial commit Discovering photos in subdirectories, renaming and deleting photos works.    
+2019-06-10: replace deleted file with deleted icon  
+2019-06-15: add "open" button to open picture in default desktop app  
+2019-12-30: GUI improvements and initial support for moving directory  
 
 TODO:  
-* Option to move photos to new directory / create new sub directory
+* ~~Option to move photos to new directory / create new sub directory~~
 * ~~Replace photo with "deleted" icon after a photo is deleted~~
 * ~~Option to open photos with 3rd party app~~
+* Auto complete new directory name
 * Allow switching between full screen and non full screen (useful for when opening picture in 3rd party app)
-* Replace default Python icon with custom icon
+* Replace default Python icon with custom icon2
 * Filter photos (size, date, ...)
 * Sort photos (date, name, ...)
 * Send "commit" to a thread and provide visual feedback that commit was called

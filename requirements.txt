@@ -4,6 +4,6 @@
 #
 #    pip-compile
 #
-pyside2==5.12.3
-send2trash==1.5.0
-shiboken2==5.12.3         # via pyside2
+pyside2
+send2trash
+shiboken2         # via pyside2

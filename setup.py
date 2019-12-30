@@ -32,7 +32,7 @@ setup(
     install_requires=['PySide2',
                       'Send2Trash'],
     include_package_data=True,
-    entry_points = {
+    entry_points={
         'gui_scripts': [
             'photo_organizer = photo_organizer.main:main',
         ]
