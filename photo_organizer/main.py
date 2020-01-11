@@ -13,15 +13,33 @@ from datetime import datetime
 from collections import deque
 deleted_picture = resource_filename(__name__, 'bitmaps/deleted-picture.png')
 
-
-@dataclass
 class image(object):
-    path: Path
-    date: datetime = datetime.fromtimestamp(0)
-    new_path: Path = None
-    size: QSize = QSize(0, 0)
-    to_delete: bool = False
-    deleted: bool = False
+    def __init__(self, path):
+        self.path = path
+        self.date = datetime.fromtimestamp(0)
+        self.new_path = None
+        self.size = QSize(0, 0)
+        self.to_delete = False
+        self.deleted = False
+
+    def flip_to_delete(self):
+        self.to_delete = not self.to_delete
+
+    def commit(self):
+        """
+        Commit name changes or file delete
+        :return: True if the image is deleted
+        """
+        if self.to_delete == True:
+            send2trash(str(self.path))
+            self.deleted = True
+            return True
+        elif self.new_path:
+            self.new_path.parent.mkdir(parents=True, exist_ok=True)
+            self.path.rename(self.new_path)
+            self.path = self.new_path
+            self.new_path = None
+        return False
 
 class listview():
     def __init__(self, items):
@@ -177,7 +195,7 @@ class AppWindow(QWidget):
         del_btn.setStyleSheet("border-style: outset;"
                               "background-color: rgb(60,60,60);"
                               "color: rgb(150,150,150)")
-        del_btn.clicked.connect(self.del_image)
+        del_btn.clicked.connect(self.switch_del_status)
 
         dir_btn = QPushButton("Discard and select directory", self)
         dir_btn.setFlat(True)
@@ -295,12 +313,11 @@ class AppWindow(QWidget):
             self.new_dir.setText(self.last_dirs_view.currentItem().text())
             self.rename_pict()
 
-
     @Slot()
-    def del_image(self):
-        p = self.current_image
-        self.images[p].to_delete = not self.images[p].to_delete
-        self.to_image(p)
+    def switch_del_status(self):
+        self.images[self.current_image].flip_to_delete()
+        # Refresh the page to indicate new status
+        self.to_image(self.current_image)
 
     @Slot()
     def rename_pict(self):
@@ -319,7 +336,7 @@ class AppWindow(QWidget):
         self.next_image()
         self.new_name.clear()
         self.rel_dir.add(self.new_dir.text())
-        self.completer.setModel(self.rel_dir)
+        self.completer.setModel(QStringListModel(self.rel_dir))
 
 
     @Slot()
@@ -365,14 +382,7 @@ class AppWindow(QWidget):
     @Slot()
     def commit_changes(self):
         for i, image in enumerate(self.images):
-            if self.images[i].new_path:
-                self.images[i].new_path.parent.mkdir(parents=True, exist_ok=True)
-                image.path.rename(image.new_path)
-                self.images[i].path = self.images[i].new_path
-                self.images[i].new_path = None
-            elif self.images[i].to_delete == True:
-                send2trash(str(image.path))
-                self.images[i].deleted = True
+            if self.images[i].commit() == True:
                 self.next_image()
 
     def to_image(self, position):
