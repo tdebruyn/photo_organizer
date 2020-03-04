@@ -1,13 +1,12 @@
 from PySide2.QtCore import QThread, QObject, Signal, Slot, Qt, QSize, QUrl, QStringListModel
-from PySide2.QtWidgets import (QApplication, QWidget, QPushButton, QCompleter,
+from PySide2.QtWidgets import (QApplication, QWidget, QPushButton, QCompleter, QShortcut,
                              QRadioButton, QVBoxLayout, QLineEdit, QSlider, QListWidget,
                              QLabel, QHBoxLayout, QFileDialog, QGroupBox, QSizePolicy)
 from PySide2 import QtCore
 from send2trash import send2trash
-from PySide2.QtGui import QDesktopServices, QPixmap, QPixmapCache, QImageReader
+from PySide2.QtGui import (QDesktopServices, QPixmap, QPixmapCache, QImageReader, QKeySequence)
 import sys
 from pathlib import Path
-from dataclasses import dataclass
 from pkg_resources import resource_filename
 from datetime import datetime
 from collections import deque
@@ -42,10 +41,8 @@ class image(object):
         return False
 
 class listview():
-    def __init__(self, items):
-        if not isinstance(items, list):
-            raise TypeError(f"listview constructor expects a list but received a {type(items)} : {items}")
-        self.items = deque(set(items))
+    def __init__(self):
+        self.items = deque()
 
     def add_item(self, item):
         if item not in self.items:
@@ -119,7 +116,7 @@ class AppWindow(QWidget):
         super().__init__()
         self.images = []
         self.current_image = 0
-        self.rel_dir = set()
+        self.listview = listview()
 
         self.build_UI()
         self.init_crawling()
@@ -148,7 +145,7 @@ class AppWindow(QWidget):
         self.new_name.setPlaceholderText("Enter new name, min 3 chars, \"del\" to delete picture")
         self.new_name.returnPressed.connect(self.rename_pict)
 
-        self.completer = QCompleter(self.rel_dir, self)
+        self.completer = QCompleter(self.listview.items, self)
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.completer.setFilterMode(Qt.MatchContains)
 
@@ -167,6 +164,8 @@ class AppWindow(QWidget):
 
         # next button
         next_btn = QPushButton("Next", self)
+        QShortcut(QKeySequence.MoveToNextChar, next_btn, self.next_image)
+
         next_btn.setFlat(True)
         next_btn.setStyleSheet("border-style: outset;"
                               "background-color: rgb(60,60,60);"
@@ -175,6 +174,7 @@ class AppWindow(QWidget):
 
         # prev button
         prev_btn = QPushButton("Previous", self)
+        QShortcut(QKeySequence.MoveToPreviousChar, next_btn, self.prev_image)
         prev_btn.setFlat(True)
         prev_btn.setStyleSheet("border-style: outset;"
                               "background-color: rgb(60,60,60);"
@@ -285,7 +285,7 @@ class AppWindow(QWidget):
         h_work.addWidget(v_radio_box)
 
         group_picture = QHBoxLayout()
-        group_picture.addLayout(info_box) #, alignment=Qt.AlignTop)
+        group_picture.addLayout(info_box)
         group_picture.addWidget(self.picture)
 
         h_buttons.addWidget(prev_btn)
@@ -335,8 +335,10 @@ class AppWindow(QWidget):
 
         self.next_image()
         self.new_name.clear()
-        self.rel_dir.add(self.new_dir.text())
-        self.completer.setModel(QStringListModel(self.rel_dir))
+        self.listview.add_item(self.new_dir.text())
+        self.completer.setModel(QStringListModel(self.listview.items))
+        self.last_dirs_view.clear()
+        self.last_dirs_view.addItems(map(str, self.listview.top_items(10)))
 
 
     @Slot()
@@ -440,7 +442,7 @@ class AppWindow(QWidget):
 
     def load_image(self, image):
         self.images.append(image)
-        self.rel_dir.add(Path(image.path.parent).relative_to(self.dir_crawler.root_dir))
+        self.listview.add_item(Path(image.path.parent).relative_to(self.dir_crawler.root_dir))
         if len(self.images) == 1:
             self.to_image(0)
         self.pic_id.setText(f"Photo {self.current_image + 1}/{len(self.images)} (loading)")
@@ -448,8 +450,8 @@ class AppWindow(QWidget):
     def dir_crawler_finished(self):
         self.pic_id.setText(f"Photo {self.current_image + 1}/{len(self.images)}")
         self.picture_slider.setMaximum(len(self.images)-1)
-        self.completer.setModel(QStringListModel(self.rel_dir))
-        self.last_dirs_view.addItems(map(str, self.rel_dir))
+        self.completer.setModel(QStringListModel(self.listview.items))
+        self.last_dirs_view.addItems(map(str, self.listview.top_items(10)))
 
     def init_crawling(self):
         self.dir_crawler = DirCrawler(self.select_dir())
@@ -457,7 +459,6 @@ class AppWindow(QWidget):
         self.dir_crawler.moveToThread(self.crawler_thread)
         self.dir_crawler.new_image_signal.connect(self.load_image)
         self.dir_crawler.finished_signal.connect(self.dir_crawler_finished)
-
         self.crawler_thread.started.connect(self.dir_crawler.crawl)
         self.crawler_thread.start()
 
